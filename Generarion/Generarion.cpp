@@ -221,9 +221,10 @@ void PrintSet(int mword) {
 Так и не понял в чем причина.
 Решил сделать в тупую(представлено ниже): генерирую тупо символ и добавляю его к массиву символов.
 */
-//int Generator(int len)
+//int Generator()
 //{
 //    int mword = 0;
+//    const int len = 10;
 //    const int firs_value = 'А';
 //    const int last_value = 'Я';
 //
@@ -290,10 +291,10 @@ int main()
     int E_Mword = 0;
 
 #pragma region Время длителности
-    clock_t t, sumt = 0;
+    clock_t t, sumt1 = 0, sumt2 = 0, sumt3 = 0, sumt4 = 0;
     
-    int countIteartion = 1;
-    const int count = 8;
+    int countIteartion = 1000000;
+    const int count = 1;
     int arCount[count];
     double timeArray[count];
     double timeList[count];
@@ -303,8 +304,8 @@ int main()
 
     for (size_t i = 1; i <= count; i++)
     {
-        
-        arCount[i-1] = countIteartion;
+
+       
         cout << "Count:" << i << endl;
         for (int i = 0; i < countIteartion; i++)
         {
@@ -312,115 +313,90 @@ int main()
             Generator(15, B);
             Generator(15, C);
             Generator(15, D);
+
+#pragma region Array
+
             t = clock();
+
             UnionSets(A, E);
+
             ExclusionSets(B, E);
             ExclusionSets(C, E);
             ExclusionSets(D, E);
-            sumt += clock() - t;
-            Discharge(A);
-            Discharge(B);
-            Discharge(C);
-            Discharge(D);
-            Discharge(E);
-        }
-        
-        cout << " Array: " << (double)sumt << endl;
-        timeArray[i-1] = (double)sumt / CLK_TCK;
-        sumt = 0;
-        
-        for (size_t i = 0; i < countIteartion; i++)
-        {
+
+            sumt1 += clock() - t;
+
+#pragma endregion
+
+#pragma region List
+
             ST* A_List = nullptr;
             ST* B_List = nullptr;
             ST* C_List = nullptr;
             ST* D_List = nullptr;
             ST* E_List = nullptr;
-            Generator(15, A);
-            Generator(15, B);
-            Generator(15, C);
-            Generator(15, D);
 
             A_List = ToList(A);
             B_List = ToList(B);
             C_List = ToList(C);
             D_List = ToList(D);
+
             t = clock();
+
             UnionSets(A_List, E_List);
 
             ExclusionSets(B_List, E_List);
             ExclusionSets(C_List, E_List);
             ExclusionSets(D_List, E_List);
-            sumt += clock() - t;
-            Discharge(A);
-            Discharge(B);
-            Discharge(C);
-            Discharge(D);
-            Discharge(E);
 
             delete A_List;
             delete B_List;
             delete C_List;
             delete D_List;
             delete E_List;
-        }
-       
 
-        cout << " List: " << (double)sumt << endl;
-        timeList[i-1] = (double)sumt / CLK_TCK;
-        sumt = 0;
-       
-        for (size_t i = 0; i < countIteartion; i++)
-        {
+            sumt2 += clock() - t;
 
-            Generator(15, A);
-            Generator(15, B);
-            Generator(15, C);
-            Generator(15, D);
+#pragma endregion
+
+#pragma region Bool array
 
             ToBool(A, A_Bool);
             ToBool(B, B_Bool);
             ToBool(C, C_Bool);
             ToBool(D, D_Bool);
+
             t = clock();
+
             UnionSets(A_Bool, E_Bool);
 
             ExclusionSets(B_Bool, E_Bool);
             ExclusionSets(C_Bool, E_Bool);
             ExclusionSets(D_Bool, E_Bool);
-            sumt += clock() - t;
-            Discharge(A);
-            Discharge(B);
-            Discharge(C);
-            Discharge(D);
-            Discharge(E);
 
-        }
+            sumt3 += clock() - t;
 
-       
-        cout << " Boolean array: " << (double)sumt<< endl;
-        timeBool[i-1] = (double)sumt / CLK_TCK;
-        sumt = 0;
-        
-        for (size_t i = 0; i < countIteartion; i++)
-        {
-            Generator(15, A);
-            Generator(15, B);
-            Generator(15, C);
-            Generator(15, D);
+#pragma endregion
+
+#pragma region Bool array
 
             A_Mword = ToMachineWord(A);
             B_Mword = ToMachineWord(B);
             C_Mword = ToMachineWord(C);
             D_Mword = ToMachineWord(D);
+
             t = clock();
+
             UnionSets(A_Mword, E_Mword);
 
             ExclusionSets(B_Mword, E_Mword);
             ExclusionSets(C_Mword, E_Mword);
             ExclusionSets(D_Mword, E_Mword);
 
-            sumt += clock() - t;
+            sumt4 += clock() - t;
+
+#pragma endregion
+
             Discharge(A);
             Discharge(B);
             Discharge(C);
@@ -433,47 +409,52 @@ int main()
             D_Mword = 0;
             E_Mword = 0;
         }
+        
+        cout << " Array: " << (double)sumt1/CLK_TCK/countIteartion << endl;
 
+        cout << " List: " << (double)sumt2 / CLK_TCK / countIteartion << endl;
        
-        cout << " Machine word: " << (double)sumt<< endl;
-        timeMachine[i-1] = (double)sumt / CLK_TCK;
-        sumt = 0;
-        countIteartion *= 10;
+        cout << " Boolean array: " << (double)sumt3 / CLK_TCK / countIteartion << endl;
+       
+        cout << " Machine word: " << (double)sumt4 / CLK_TCK / countIteartion << endl;
     }
 
-    ofstream out;
+    /*ofstream out;
     out.open("C:\\Users\\Илья\\source\\repos\\Generarion\\Generarion\\data.txt");
     for (size_t i = 1; i <= count; i++)
     {
-        out << arCount[i - 1] << ';';
+        if (i > 1) out << ';';
+        out << arCount[i - 1];
     }
     out << endl;
 
     for (size_t i = 1; i <= count; i++)
     {
-        out << timeArray[i - 1] << ';';
+        if (i > 1) out << ';';
+        out << timeArray[i - 1];
     }
     out << endl;
 
     for (size_t i = 1; i <= count; i++)
     {
-        out << timeList[i - 1] << ';';
+        if (i > 1) out << ';';
+        out << timeList[i - 1];
     }
     out << endl;
 
     for (size_t i = 1; i <= count; i++)
     {
-        out << timeBool[i - 1] << ';';
+        if (i > 1) out << ';';
+        out << timeBool[i - 1];
     }
     out << endl;
 
     for (size_t i = 1; i <= count; i++)
     {
-        out << timeMachine[i - 1] << ';';
-    }
-    out << endl;
-
-#pragma endregion
+        if (i > 1) out << ';';
+        out << timeMachine[i - 1];
+    }*/
+    /*out << endl;*/
 
     return 0;
 }
